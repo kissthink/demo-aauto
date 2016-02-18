@@ -1,0 +1,117 @@
+//调用C#程序集 
+import dotNet; 
+import console;
+
+import dotNet; 
+var clr,err = dotNet.clr( "v4.0","v2.0" ); 
+if( !clr ){
+    console.log("当前系统未安装.Net Framework 2.0 以上版本", err )
+    console.pause();
+    return;
+}
+
+//创建应用程序域
+var appDomain = clr.createAppDomain();
+
+//引用程序集,注意凡aardio扩展的接口函数首字母小写,凡C#对象提供的接口函数首字母大写
+var system = appDomain.load("System");
+var CSharpCodeProvider = system.createInstance( "Microsoft.CSharp.CSharpCodeProvider" )
+
+//加载应用程序目录下的程序集( 或 "/bin/" 目录下的程序集 )
+var CSNET2ClassLibrary = appDomain.load("CSNET2ClassLibrary");
+var simpleObject = CSNET2ClassLibrary.createInstance("CSNET2ClassLibrary.CSSimpleObject") 
+
+//直接指定文件路径，资源文件路径，或内存数据加载程序集
+var Interop = appDomain.loadFile($"~/lib/dotNet/.res/Aardio.InteropServices.dll");
+var csProxy = Interop.createInstance("Aardio.InteropServices.CSharp");
+ 
+//加载程序集并创建实例,支持添加多个构造参数
+var CSSimpleObject = appDomain.createInstance( "CSNET2ClassLibrary","CSNET2ClassLibrary.CSSimpleObject");
+console.log( "创建实例并获取值",CSSimpleObject.FloatProperty )
+
+/******
+对于 .Net 中创建并返回的对象实例，aardio默认全部转换为COM对象，
+所以 .Net 对象在 aardio中也可以象COM对象一样使用，例如上面的 CSSimpleObject.FloatProperty 。
+但部份.Net对象的成员无法通过COM接口访问，aardio在dotNet支持库中还提供了以下系列函数可以直接调用这些成员
+
+BindingFlags参考.Net中System.Reflection.BindingFlags的说明
+appDomain.invokeMember(程序集,"类名","方法名",BindingFlags,目标对象,其他任意个调用参数) 
+appDomain.invokeObjectMember(目标对象,"方法名",BindingFlags,其他任意个调用参数) 
+上面两个函数的用法相同，区别是invokeObjectMember的第一个参数是.Net中创建的对象
+
+以下还有一些具体指定了BindingFlags的函数(实际上是封装了上面两个函数）
+invokeInstanceMember(目标对象,"方法名",其他任意个调用参数) //调用对象的实例成员函数
+getInstanceMember(目标对象,"成员名字") //获取对象的成员值
+setInstanceMember(目标对象,"成员名字",值) //设置对象的成员值
+
+invokeStaticMember((程序集,"类名","方法名",其他调用参数) //调用静态函数
+getStaticMember(程序集,"类名","字段名") //获取静态成员值
+
+invokeCreateInstance(程序集,"类名",其他调用参数) //调用指定构造函数创建对象
+createInstance(程序集,"类名") //调用默认构造函数创建对象
+createInstanceFrom("程序集跃径","类名") //调用默认构造函数创建对象
+
+注意 aardio 调用.Net组件 不可能有C#那么方便，试图用 aardio 替代C#不应该是使用dotNet支持库的目的。
+我们建议大家使用C#去调用.Net并且生成DLL - 提供简洁并易于在aardio中调用的接口。
+******/
+
+//下面的代码等价于  CSSimpleObject.FloatProperty = 936
+appDomain.setInstanceMember(CSSimpleObject,"FloatProperty",936) 
+
+//下面的代码等价于 console.log( CSSimpleObject.FloatProperty )
+console.log( appDomain.getInstanceMember(CSSimpleObject,"FloatProperty") ) 
+
+
+//指定文件路径加载程序集并创建实例
+var CSSimpleObject = appDomain.createInstanceFrom( "/CSNET2ClassLibrary.dll","CSNET2ClassLibrary.CSSimpleObject");
+console.log( "创建实例并获取值",CSSimpleObject.FloatProperty )
+
+//调用类的静态方法
+var ret  = appDomain.invokeStaticMember( 
+    "\CSNET2ClassLibrary.dll" //指定程序集，写路径或程序集名都可以
+    ,"CSNET2ClassLibrary.CSSimpleObject" //类名称
+    ,"GetStringLength" //静态方法名
+    ,"HelloWorld" //支持不定个数参数
+    ); 
+
+console.log( "静态方法返回值",ret )
+
+//卸载应用程序域
+appDomain.unload();
+
+console.pause();
+
+/****
+
+\CSNET2ClassLibrary.dll 的 C#源码如下：
+
+namespace CSNET2ClassLibrary
+{
+    using System;
+    using System.Runtime.InteropServices;
+
+    [ComVisible(true), ClassInterface(ClassInterfaceType.AutoDual), IDispatchImpl(IDispatchImplType.InternalImpl)]
+    public class CSSimpleObject
+    {
+        private float fField = 13456.78f;
+
+        public static int GetStringLength(string str)
+        {
+            return str.Length;
+        }
+
+        public float FloatProperty
+        {
+            get
+            {
+                return this.fField;
+            }
+            set
+            {
+                this.fField = value;
+            }
+        }
+    }
+}
+****/
+

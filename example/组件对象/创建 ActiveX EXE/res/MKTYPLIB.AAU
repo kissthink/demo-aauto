@@ -1,0 +1,4 @@
+import vc6; 
+vc6("/").exec(
+	'MKTYPLIB.EXE res/AardioCOM.odl' //生成 res/aardioCOM.tlb类型库
+)

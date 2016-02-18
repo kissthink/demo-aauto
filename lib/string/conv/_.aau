@@ -1,0 +1,87 @@
+namespace string.conv;
+
+LCMapString = ::Kernel32.api("LCMapStringA","int(int locale,INT flags,str src,int cchSrc,str &dest,int cchDest)") 
+mapString = function(str,locale,flags){
+	var len = LCMapString( locale,flags, str, #str, 0,0) 
+	if(len){
+		var len,str = LCMapString( locale,flags, str, #str, len+1,len+1) 
+		return str;
+	}
+}
+
+var codepage = ::Kernel32.GetACP();
+localized = function(vaule,vcp){
+	if( vcp === null ) vcp = _STUDIO_CODEPAGE;
+	if( vcp === codepage ) return vaule;
+	var t =  type(vaule);
+	if( t == "table" ){
+		for(k,v in vaule){ vaule[k] = localized(v) }
+	 	return vaule; 
+	}
+	elseif( t == "string" ){
+		if( !#vaule ) return vaule;
+		return codepage == 950 ? gbkToBig5(vaule) : big5ToGbk(vaule);
+	}
+	return vaule;
+}
+
+fromUnicode = function(u){
+	var s = ..string.fromUnicode(u,936); 
+	if( codepage == 936 ) return s;
+	return gbkToBig5(s);
+}
+
+traditionalized = function(str,lcid){
+	if( lcid === null || ( type(lcid) == "boolean" ) ){
+		lcid = 0x804;
+	}
+	return mapString(  str ,lcid, 0x4000000/*_LCMAP_TRADITIONAL_CHINESE*/ ); 
+}
+
+simplized = function(str,lcid){
+	if( lcid === null || ( type(lcid) == "boolean" ) ){
+		lcid = 0x804;
+	}
+	str = mapString(  str ,lcid, 0x2000000/*_LCMAP_SIMPLIFIED_CHINESE*/);
+	return str;
+} 
+
+gbkToBig5 = function(str){ 
+	str = traditionalized(str,true);
+	return ..string.fromto(str,936,950); 
+}
+
+big5ToGbk = function(str){
+	str = ..string.fromto(str,950,936) 
+	return simplized(str,true); 
+}
+
+var defaultLCID = ::Kernel32.GetSystemDefaultLCID();
+upper = function(str){
+	return  mapString(  str ,defaultLCID, 0x200/*_LCMAP_UPPERCASE*/);	
+}
+
+lower = function(str){
+	return  mapString(  str ,defaultLCID, 0x100/*_LCMAP_LOWERCASE*/);	
+}
+
+toWide = function(str){
+	return  mapString(  str ,defaultLCID, 0x800000/*_LCMAP_FULLWIDTH*/);	
+}
+
+fromWide = function(str){
+	return  mapString(  str ,defaultLCID, 0x400000/*_LCMAP_HALFWIDTH*/);	
+}
+ 
+/**intellisense(string.conv)
+toWide(__/*字符串*/) = 半角转全角
+fromWide(__/*字符串*/) = 全角转半角
+upper(__/*字符串*/) = 转大写
+lower(__/*字符串*/) = 转小写
+fromUnicode(__/*字符串*/) = 根据默认内码转换为本地语言
+localized("__") = 根据默认内码自动转换简繁体字,\n参数可以是字符串或表对象,建议使用字面常量以避免错误转换,\n不可使用成员字段循环引用的表参数
+traditionalized(.(简体字) = GBK编码繁体字转简体字
+simplized(.(繁体字) = GBK编码简体字转繁体字
+gbkToBig5(__/*GBK字符串*/) = GBK简体转BIG5繁体
+big5ToGbk(__/*GBK字符串*/) = BIG5繁体转GBK简体\ 
+end intellisense**/

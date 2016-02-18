@@ -1,0 +1,62 @@
+//1、入门示例
+
+/*
+默认自带绿色精简版的JRE(版本1.6),压缩后6.8MB,可根据需要继续精简,或替换JRE版本
+默认在EXE目录或工程目录下的JAVA/jre 子目录查找jre,删除自带jre将会使用系统安装的jre或jdk(向下兼容jre 1.7,1.7,1.8.....)
+*/
+import java;  
+import console;
+
+console.open();
+var jvm = java(); //创建Java虚拟机
+
+/*
+注意java会到 "默认类搜寻路径" + "类名(替换'.'为'\')" 去查找类
+与aardio中的库类似名字空间与类文件路径一致，"默认类搜寻路径"为"/java/"以及"/java/*.jar"
+用下面的函数可以动态添加类搜索位置(目录或jar文件)
+*/
+jvm.addClassLoaderUrl("~\example\Java语言\java"); 
+
+/*
+自内存或文件直接加载类,注意下面的$操作符指示aardio在编译时将文件置入内存
+而路径前面的波浪线~表示EXE根目录(开发时指开发环境根目录)
+*/
+HelloworldApp = jvm.defineJavaClass("aardio.sample.HelloworldApp",$"~\example\Java语言\java\aardio\sample\HelloworldApp.class") 
+
+/*
+查找类对象的方法很简单
+*/
+HelloworldApp = jvm.findJavaClass("aardio.sample.HelloworldApp")
+
+/*
+查找类的静态方法,注意函数原型一定要正确匹配Java中的函数定义,
+如果仅仅名字是对的,函数原型是错的一样会找不到
+*/
+var jmain = jvm.getStaticClassMethod(  
+	HelloworldApp, //这里可以是类名,也可以是已加载的类对象
+	"main", //函数名 
+	"string(string[])"//函数原型语法与API相同,不同的是可以使用[]表示数组参数
+);
+ 
+/*
+调用Java函数很简单,与普通函数一样使用
+*/
+var str = jmain( "测试","运行java") 
+console.log( str )
+
+//创建java对象
+var jstring = jvm.newJavaObject( 
+	"java.lang.String", //指定类名
+	"void(WORD[])", //指定构造函数
+	string.fromto("测试",0,65001) //传入构造参数
+	); 
+	
+ 
+//创建java对象,如果是默认构造函数,即原型为 void() 可省略其他参数
+var helloworld = jvm.newJavaObject( "aardio.sample.HelloworldApp" );
+
+//获取Java对象的方法
+test = helloworld.getMethod("test","int(int)")
+console.log( test(3) );//调用Java对象的方法
+console.pause()
+ 

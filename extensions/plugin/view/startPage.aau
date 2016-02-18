@@ -1,0 +1,241 @@
+import win.ui;
+/*DSG{{*/
+var winform = ..win.form(text="开始页.....";left=0;top=0;right=599;bottom=399;border="none";exmode="none";mode="child";parent=...;scroll=1)
+winform.add()
+/*}}*/
+
+import ide;
+import web.layout;
+
+var wbLayout = web.layout(winform);   
+wbLayout.go("\res\start-page.htm");  
+ide.pluginViewShow(winform); 
+wbLayout.wait();
+ 
+import string.xml;
+getProjectInfo = function(path){
+ 	if(!path) return;
+ 	if( ..string.startWith(path,"\\") ) return;
+ 	
+	var xmlstr = string.load(path); 
+	if(!xmlstr) return;
+	
+	var xmlDoc = string.xml( xmlstr )
+ 	if(!xmlDoc) return;
+
+
+	var project = xmlDoc.queryEles( tagName = "project"); 
+	if(!project) return;
+	return project[1];
+}
+
+loadRecentProjectFromFile = function(){
+	var recentList = {};
+	var cfgRecentProject = ..string.load("~/config/RECENT.PROJECT.TABLE");
+	if( cfgRecentProject ){
+		try{
+			recentList = eval(cfgRecentProject)
+		} 
+	}	
+	return recentList;
+}
+
+refreshRecentProject = function(){
+	var ltList = wbLayout.getEle("recent-projects-list"); 
+	ltList.innerHTML = "";
+	
+	var recentList = loadRecentProjectFromFile();
+	if( #recentList ){
+		var len = #recentList;
+		if( len > 6 ) len = 6;
+		for(i=1;len;1){
+			if(!recentList[i])break;
+			var inf = getProjectInfo( recentList[i] );
+			if(!inf) {
+				if( #recentList + 1 > len ){
+					table.remove(recentList,i);
+					i--;
+				}
+				continue;
+			}
+			ltList.printf( '<li href="%s" title="%s" name="recent-project-item">%s <button name="delete-project"><img src="images/delete.png"/> </button></li> '
+				,recentList[i],recentList[i],inf.name ); 
+		}
+	}
+	else {
+		ltList.innerHTML =  '<li href="http://api.aardio.com/aardio/doc/first-project" >我的第一个工程</li>'
+	}	
+}
+refreshRecentProject(); 
+
+import process;
+wbLayout.sinking = { 
+	onHyperlinkClick = {
+		["recent-project-item"] = function (ltTarget,ltEle,reason,behaviorParams) {
+			
+			var path = ltEle.href; 
+			if( io.exist(path) ){ 
+				thread.invoke( 
+					function(path){
+						import ide;
+						ide.openDocument(path);
+					},path
+				) 
+			}
+			return true;
+		}
+		["create-project"] = function (ltTarget,ltEle,reason,behaviorParams) {  
+			thread.invoke( 
+					function(path){
+						import ide;
+						ide.newProject();
+					},path
+				)
+			return true;
+		}
+		["open-project"] = function (ltTarget,ltEle,reason,behaviorParams) { 
+		
+			import fsys.dlg;
+			var defDir = ide.getConfig("project_default_dir");
+			
+			var recentList = loadRecentProjectFromFile();
+			if(#recentList) defDir = ..fsys.getParentDir( recentList[1] ); 
+			
+			var path = fsys.dlg.open("aardio工程文件|*.aproj||","请选择要打开的aardio工程文件",defDir,ide.getMainHwnd(),,"default.aproj")
+			if( path ? io.exist(path) ){ 
+				thread.invoke( 
+					function(path){
+						import ide;
+						ide.openDocument(path);
+					},path
+				) 
+			}
+			return true;
+		}
+		["update-tool"] = function (ltTarget,ltEle,reason,behaviorParams) { 
+			loadcode("~\tools\update.aau")("自动更新");
+			ltEle.delete();
+			return true;
+		} 
+		
+		["lnkdsk"]= function (ltTarget,ltEle,reason,behaviorParams) { 
+			import fsys.lnk;
+
+			lnk = fsys.lnk(); 
+			lnk.description = "aardio桌面软件快速开发工具"  
+			
+			lnk.path = io._exepath //设置目标路径
+			lnk.setIcon(io._exepath,0); //设置图标
+			 
+			lnk.save(
+				fsys.joinpath( 
+					fsys.getSpecial(0x0010 /*_CSIDL_DESKTOPDIRECTORY*/ )
+					,"aardio.lnk" 
+					)
+			) 
+			
+			..fsys.delete( fsys.joinpath( 
+					fsys.getSpecial(0x0010 /*_CSIDL_DESKTOPDIRECTORY*/ )
+					,"快手 AAuto.lnk" 
+					) )
+			
+			loadcode("/dsktip.aau")();
+			return true;
+		} 
+		
+		["jiaqun"] = function (ltTarget,ltEle,reason,behaviorParams) {
+			import web.form;
+			var frmJiaQun = win.form(text="Web Form";right=1;bottom=1);
+			var wb = web.form( frmJiaQun ,,,,true/*securityTrusted*/ );
+			wb.noScriptErr=true;
+			wb.go(ltEle.href);
+			wb.wait(,5000);
+			frmJiaQun.close();
+			return true;
+		}
+		["default"] = function (ltTarget,ltEle,reason,behaviorParams) {
+			var path = ltEle.href;  
+			if( ..string.endWith(path,".aau",true)  ){  
+				import inet.url; 
+				var code,err = win.invoke(
+					function(url){
+						import inet.http;
+						return inet.http(null,"").get(url)
+					},path
+				)
+				if(!code) {
+					if(path) process.execute(path);
+					return true;
+				}
+				
+				import fsys;
+				fsys.createDir("/.sampleCode/");
+				
+				var codePath = "/.sampleCode/" + ..string.match(path,"[^/]+$");
+				string.save(codePath,code ) 
+				ide.openDocument(codePath)
+				return true;
+			} 
+			
+			if(path) process.execute(path);
+			return true;
+		}
+	}
+}
+
+wbLayout.onButtonClick = {
+	["delete-project"] = function (ltTarget,ltEle,reason,behaviorParams) {
+		var recentList = loadRecentProjectFromFile(); 
+		if(#recentList){
+			var idx = ..table.find( recentList,ltEle.parent().href ); 
+			if(idx){ 
+				table.remove( recentList,idx)   
+				..string.save("~/config/RECENT.PROJECT.TABLE", table.tostring(recentList)); 
+				refreshRecentProject(); 
+			} 
+		}                
+	}
+	["search-tool"] = function (ltTarget,ltEle,reason,behaviorParams) { 
+		loadcode("~\tools\search.aau")("自动更新"); 
+		return true;
+	} 
+}
+
+var htmlNews = win.invoke(
+	function(cfgVersion){
+		import inet.http;
+		import win.version;
+		var http = inet.http("aardio/v" + _AARDIO_VERSION + "(IDE "  + cfgVersion + "," + win.version.name + ")",""); 
+		var html  = http.get("http://api.aardio.com/aardio/api/start-page.v8/"); 
+		http.close();
+		return html;
+	} ,ide.getConfig("version")
+)
+if( htmlNews ) {
+	wbLayout.getEle("start-page-news").innerHTML = htmlNews;
+}
+else {
+	wbLayout.getEle("start-page-news").innerHTML = "<li href='#'>获取官网最新消息失败......<li>"
+}
+
+import thread.command;
+var listener = thread.command.instance();
+listener.aardioQuickerUpdated = function(strVersion){
+	if(!strVersion)return;
+	var ltEle = wbLayout.getEle("update-tool")
+	if( ltEle ) ltEle.delete();
+	
+	var html =  "<li href='#' #update-tool style='color:red;'>发现aardio已更新版本:" + strVersion + ",点这里立即更新<li>"
+	wbLayout.getEle("start-page-news").insertAdjacentHTML("afterBegin", html);
+	ide.mdiActivate( winform.hwnd );
+} 
+listener.aardioQuickerUpdateFinish = function(){
+	var ltEle = wbLayout.getEle("update-tool")
+	if( ltEle ) ltEle.delete();
+}
+
+import thread.event;
+var event = thread.event("{5D345FB2-C8CC-4EA6-B762-FCB2A40CE799}.update.startpage") 
+event.set();
+
+win.loopMessage();

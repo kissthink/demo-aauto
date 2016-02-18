@@ -1,0 +1,10 @@
+ 
+import fsys;
+..fsys.copy( "\php\" ,"~\lib\",0x10/*_FOF_NOCONFIRMATION*/  | 0x200/*_FOF_NOCONFIRMMKDIR*/); 
+
+import ide;
+ide.refreshStdLib();
+
+import win;
+win.msgboxTimeout("PHP库已安装成功","aardio - PHP扩展库安装程序",1000)
+

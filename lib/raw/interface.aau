@@ -1,0 +1,75 @@
+//interface 静态接口
+namespace raw;
+	
+var app = ..raw.loadDll(); 
+var convert = ..raw.convert;
+class interface{
+	ctor( inObject,itface,cal="stdcall" ){   
+		if(!inObject) error("无效的接口(参数@1)",2);
+		
+		var inObjectType = type(inObject);
+		if( inObjectType == "number" ) inObject = topointer(inObject);
+		
+		var outStruct;
+		var itfaceType = type(itface);	
+		if( itfaceType == "string" ) {
+			var s = {}; 
+			outStruct = {}
+			for r,f,a in ..string.gmatch(itface ,"(\S+)\s+(\S+)(%())") { 
+				..table.push(s,"ptr " + f);
+				outStruct[f] = r ++ a;
+			}
+			outStruct._struct = ..string.join(s,';' );
+		}
+		elseif( itfaceType == "class" ) {
+			outStruct = itface();
+		}
+		else {
+			error("参数@2类型错误",2);
+		}
+		
+		var outObjectFuncProto = {};
+		for( k,proto in outStruct){  
+			if( type(proto) != "string" ) continue;
+			outObjectFuncProto[k] = proto;
+		}
+		
+		if( (inObjectType == "table") && (!inObjectType@) ){
+			if( cal != "stdcall" ) error("实现接口仅支持标准stdcall调用约定!",2);
+			 
+			for( k,proto in outObjectFuncProto){  
+				ptr = inObject[k];
+				if( (!proto) || ( type(ptr) != "function" )   ){ 
+					continue; 
+				} 
+				outStruct[k] = ..raw.tostdcall(function(p,...){ return inObject[k](...)} 
+					, ..string.replace(proto,"\(","(ptr,"),this);
+				this[k] = inObject[k];
+			} 
+			 
+			this.__vtbl = ..raw.malloc(outStruct);
+			this.__thisPointer = ..raw.malloc({ pointer __vtbl = this.__vtbl });
+		}
+		else { //转换指针为接口,inObject可以是指针、数值、或元方法中定义了_topointer的对象
+			outStruct = convert( convert( inObject,{ pointer __vtbl } ).__vtbl ,outStruct ) ;
+			
+			var ptr; 
+			for( k,proto in outObjectFuncProto){  
+				ptr = outStruct[k];
+				if( (!proto) || ( type(ptr) != "pointer" )   ){ 
+					continue; 
+				}
+				outStruct[k] = app.api(ptr,proto,cal,inObject);//声明API时,可选使用第四个参数指定this指针
+			}  
+			
+			this = outStruct;
+			this.__thisPointer = inObject;//gc
+		}
+	}
+	@{_topointer = inObject}
+} 
+
+/**intellisense()
+raw.interface = 用于将接口指针绑定到静态类型接口\nC++类中的成员函数请使用virtual关键字声明为虚函数
+raw.interface() = @.interface( __/*接口指针*/,"\n	void getName(string &buffer,int len);\n	bool getInfo(struct &pInfo); \n	","thiscall"\n)
+end intellisense**/

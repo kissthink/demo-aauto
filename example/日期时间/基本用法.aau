@@ -1,0 +1,46 @@
+import console;
+
+console.log( time.tick(),"系统运行时间(毫秒数)")
+
+tm = time.now();
+
+tm.year += 2;
+console.log(tm,"增加2年")
+
+tm.addsecond(30)
+console.log(tm,"增加30秒")
+
+tm.addminute(180)
+console.log(tm,"增加180分")
+
+tm.addhour(2)
+console.log(tm,"增加两小时")
+
+tm.addday(365)
+console.log(tm,"增加365天")
+
+tm.addmonth(-24)
+console.log(tm,"倒退24个月")
+
+tm2 = time.now()
+
+console.log( tm2.diffmonth(tm) ,"相差月份")
+console.log( tm2.diffday(tm) ,"相差天数")
+console.log( tm2.diffhour(tm) ,"相差小时数")
+console.log( tm2.diffminute(tm) ,"相差分钟数")
+console.log( tm2.diffsecond(tm) ,"相差秒数")
+console.log( tonumber(tm) - tonumber(tm2) ,"相差秒数,作用同上")
+
+console.log('\n关系运算符，相等、不等')
+console.log( "tm2==tm", tm2 == tm  )
+console.log( "time.now()== time.now()", time.now()== time.now() )
+
+console.log('\n关系运算符，大于、小于')
+console.log( "tm2>tm", tm2 > tm  )
+console.log( "time.now() > time.now()", time.now() > time.now() )
+
+console.log('\n关系运算符，大于等于、小于等于')
+console.log( "tm2 <= tm", tm2 <= tm  )
+console.log( "time.now() <= time.now()", time.now() <= time.now() )
+
+console.pause()

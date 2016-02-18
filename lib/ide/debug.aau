@@ -1,0 +1,43 @@
+//debug 调试
+namespace ide.debug;
+
+onError = function(err,over){  
+	if(type(err) != type.string ) return; 
+	err = ..string.replace(err,'@\n`error`:\n','\n');
+	err = ..string.replace(err,"\n----------------------\s*\n\s*",'\n'); 
+	err = ..string.replace('\n'+err,"\n`?([\a\s]*?)`?\:", {
+		["near"] = '\n靠近:';
+		["byte"] = '\n字节码:';
+		["error"] = '\n错误:';
+		["file"] = '\n文件:';
+		["line"] = '\n错误行号:';
+		["field"] = '\n字段:';
+		["failed"] = '\n失败操作:';
+		["attempt to"] = '\n不支持此操作:';
+		["kind"] = '\n定义类型:';
+		["name"] = '\n名字:';
+		["type"] = '\n类型:';
+		["expected"] = '\n预期:';
+		["got"] = '\n实际获取:';  
+		["struct error"] = '\n结构体错误:'; 
+		["match for"] = '\n匹配于:'; 
+		["match line"] = '\n匹配行:'; 
+		["expected size"] = '\n预期大小:'; 
+		["bad argument"] = '\n错误参数:'; 
+		["calling"] = '\n调用函数名:'; 
+		["declare api"] = '\nAPI函数声明:'; 
+		["data type error"] = '\n参数类型错误:'; 
+	} );
+	
+	err = ..string.replace(err,"`<.*?>`", {
+		["unexpected symbol"] = "<未知符号>";
+		["unexpected end"] = "<意外结束>";
+		["name"] = "<标识符>";
+	} );
+	err = ..string.trim(err);
+ 
+	import debug;
+	return ..string.concat('按 Ctrl + C复制错误信息\n---------------------------------------------------\n'
+		,err ,'\n---------------------------------------------------\n'
+		, debug.traceback(,'调用栈:',3 ) );
+}

@@ -1,0 +1,50 @@
+var filepath = ...;
+
+import com;
+import process;
+import fsys.mime;
+import fsys.wow64;
+import process.cache;
+import fsys.lnk;
+
+var m = fsys.mime.fromFile(filepath);
+if( ..string.startWith(m,"image/",true)){
+
+    var opened;
+    fsys.wow64.disableRedirection(
+        function(){
+            var path = fsys.lnk.search("photoshop.exe");
+            if(path){
+                process.execute(path,process.escapeArgument(filepath)); 
+                opened = true;
+            }
+        }
+    ) 
+    if(opened) return;
+    
+    try{
+        var psApp = com.CreateObject("Photoshop.Application");
+        psApp.open(filepath);
+        opened = true;
+    }
+    if(opened) return; 
+}
+if( ..string.startWith(m,"text/",true)  ){ 
+
+    var editor = process.cache.find( ,"Sublime Text") || fsys.lnk.search("sublime" )
+    if( editor ){
+        process.execute(editor,..fsys.shortpath(filepath) ) //sublime启动参数只支持短文件名
+        return;
+    } 
+ 
+    var editor = process.cache.find( ,"@@notepad++.exe") || fsys.lnk.search("@@notepad++.exe" ) 
+    if( editor ){
+        process.execute(editor,filepath)
+        return;
+    }
+} 
+
+if(!process.execute(filepath,,"edit") ){
+	import process.rundll;
+	process.rundll("shell32","OpenAs_RunDLL " + filepath )
+}

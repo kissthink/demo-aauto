@@ -1,0 +1,91 @@
+//简单HTTP服务器
+import console
+import wsock.tcp.server; 
+var tcpServer, errMsg = wsock.tcp.server("127.0.0.1",8081) 
+
+console.open();
+console.setTitle("简单HTTP服务器" ) 
+if(!tcpServer){
+    console.log( errMsg )
+    console.pause();
+    return;
+} 
+
+/*
+import web.rest.client; 
+var http = web.rest.client();
+http.setAuth( "用户名", "密码" );
+http.get( "http://ddns.oray.com/ph/update",{ hostname = "****.xicp.net" } );
+*/
+
+console.setTitle("简单HTTP服务器已启动" );
+tcpServer.forever(
+    function(acceptSocket){ 
+     
+         ..thread.invoke( 
+             function(acceptSocket){
+                 import console;
+                 import wsock.tcp.client;
+                 
+                 var response = wsock.tcp.client(,acceptSocket);  
+                var protocolLine = ..string.trim( response.readTo('\r\n') );
+                var tProtocol = ..string.splitEx(protocolLine,"\s+",3);
+             
+                if( ( #tProtocol != 3 ) || (!..string.startWith(tProtocol[3],"HTTP",true) ) ){
+                    response.close();
+                    return;
+                }
+                
+                var requestInfo = {};
+                requestInfo.method = tProtocol[1];
+                requestInfo.uri = tProtocol[2];
+                requestInfo.version = tProtocol[3];  
+                var httpHeader = response.readTo('\r\n\r\n'); 
+                
+                import string.list;
+                var tHeader = ..string.list(httpHeader,'\r\n',":");
+                
+                requestInfo.headers = {};
+                for i,k,v in tHeader.each() { 
+                    requestInfo.headers[ ..string.lower(k) ] = v;
+                }
+                
+                if( requestInfo.headers["content-length"] ){
+                    requestInfo.data = response.read( tonumber(requestInfo.headers["content-length"],10) );
+                }
+                
+                response.write(requestInfo.version + " 200 OK" + '\r\n');
+                response.write('Access-Control-Allow-Origin:*\r\n');//服务端 header('Access-Control-Allow-Origin:http://localhost:端口号'); 
+                response.write('Content-Type: text/javascript\r\n');
+                
+                var data = 'callback({message:"success"})';
+                response.write('Content-Length:' + #data + '\r\n');
+                response.write('\r\n');
+                
+                response.write(data);
+                response.close();	
+                
+                console.dump(requestInfo)		
+             },acceptSocket
+         ) 
+    }
+) 
+
+/*
+jQuery Ajax 跨域调用方法,可实现浏览器与本地应用交互
+
+$.ajax({
+	type: "get", 
+	dataType: "text",  
+	async:false,  
+	crossDomain: true, //应用CORS跨域机制,必须设置Access-Control-Allow-Origin头,不适合IE低版本
+	url:"http://localhost:8081",   
+	success: function(msg){
+		alert( msg.message );
+	},
+	error: function (XMLHttpRequest, textStatus, errorThrown) { 
+        alert(errorThrown); //crossDomain: true,async:false, 才能捕获网络错误
+    } 
+    
+} );
+*/

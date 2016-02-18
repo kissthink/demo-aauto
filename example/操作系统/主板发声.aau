@@ -1,0 +1,57 @@
+//播放声音,声卡检测
+import console;
+
+class WAVEOUTCAPS { 
+    WORD wMid; 
+    WORD wPid; 
+    INT vDriverVersion; 
+    BYTE szPname[0x20/*_MAXPNAMELEN*/]; 
+    INT dwFormats; 
+    WORD wChannels; 
+    WORD wReserved1; 
+    INT dwSupport; 
+} ; 
+
+::Winmm  :=  ..raw.loadDll("Winmm.dll");
+var outcaps = WAVEOUTCAPS();
+
+if(  0/*_MMSYSERR_NOERROR*/= ::Winmm.waveOutGetDevCaps(0,outcaps,52) ){
+	import fsys.version;
+	console.log(ret, "声卡驱动版本：",fsys.version( outcaps.vDriverVersion << 16 ) )
+	//console.log(outcaps.szPname + "..."); //这里超过31个字符会被截断
+	
+	import sys.soundDevice;
+	sys.soundDevice.enum(
+	    function(description,dataFlow,dataType,deviceId,module,interface,waveDeviceId){
+	        if( !dataFlow ){
+	            console.log(description); //显示声卡完整名称
+	            return false;
+	        }
+	        return true;
+	    }
+	)
+}
+else {
+	console.log("没有找到声卡")
+	console.pause(true);
+	return;
+}
+
+
+/*
+主板发声
+第一个参数指定声音频率(从37Hz到32767Hz),第二个参数指定持续时间声音的持续时间，
+以毫秒为单位。如为-1，表示一直播放声音，直到再次调用该函数为止。
+*/
+::Kernel32.Beep(1566,1000);
+
+//播放系统警报声
+::User32.MessageBeep(0x10/*_MB_ICONHAND*/);
+
+//播放wav文件
+import fsys.media;
+fsys.media.playSound("/my.wav" );
+
+//播放mp3
+var mediaFile = fsys.media("/mp3/my.mp3");
+//mediaFile.play("wait");

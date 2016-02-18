@@ -1,0 +1,28 @@
+//命名管道
+
+thread.invoke( 
+	function(){
+		import console;
+		import fsys.namedPipe;
+		
+		var pipeClient = fsys.namedPipe.wait("\\.\pipe\pipename","r+")
+		
+		if( pipeClient ){
+			console.log( pipeClient.read() )
+			pipeClient.write('服务端你好啊\r\n');
+			pipeClient.close(); 
+		}
+	}
+)
+
+import console;
+import fsys.namedPipe;
+
+var pipeServer = fsys.namedPipe("\\.\pipe\pipename",2,2000)
+if( pipeServer.connect() ){ 
+	pipeServer.write('客户端你好\r\n')
+	console.log( pipeServer.read() )
+}
+
+pipeServer.disconnect();
+console.pause();

@@ -1,0 +1,18 @@
+//判断是否64位系统
+import console;
+import process;
+import sys.info;
+
+console.log( "是否64位", process().isWow64(),sys.info().isX64() );
+console.more(1)
+
+import win.version;
+console.dump(win.version);
+
+if( win.version.majorVersion >= 6 ){
+	GetProductInfo = Kernel32.api("GetProductInfo","bool( INT marjor,INT minor,INT spMajor,INT spMinor,INT &type)" );
+	var ret,pType = GetProductInfo(win.version.majorVersion,..win.version.minorVersion,0,0,0);
+	console.dump(pType);//请自行搜索相关资料
+}
+
+console.pause();

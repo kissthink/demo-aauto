@@ -1,0 +1,244 @@
+//搜索助手
+import win.ui;
+/*DSG{{*/
+var winform = ..win.form(text="官网搜索助手";right=923;bottom=635;exmode="none";mode="popup";parent=...)
+winform.add()
+/*}}*/
+
+import web.layout;
+var wbLayout = web.layout( winform );
+
+import web.form; 
+namespace web.layout.behavior.webBrowser {  
+	onElementControlCreated = function (ltTarget,ltOwner,reason,behaviorParams) {
+		var ltCtrl = ltOwner.getCtrl(); 
+		wb = ..web.form( ltCtrl,0x4/*_UIFLAG_NO3DBORDER*/  , , ,true/*securityTrusted*/ ) 
+		ltCtrl.translateAccelerator = function( msg ){
+			var message,vk = msg.message,msg.wParam;
+    		if (   (message == 0x100/*_WM_KEYDOWN*/) || (message== 0x101/*_WM_KEYUP*/) ) { 
+        		if( /**( vk == 0x74/*_VK_F5*/ )
+            		|| **/( ( vk == 'N'# ) && ( ( ::GetKeyState(0x11/*_VK_CTRL*/) & 0x8000 ) == 0x8000 ) ) ) 
+        		{
+            		return true;   
+        		} 
+    		}  
+    		return wb._host.tranacc(msg)
+		}
+		if( !_STUDIO_INVOKED ){
+			wb.noScriptErr = true;
+		}
+		wb.go(  "http://update.aardio.com/search?q=" + winform.keyword )   
+		ltOwner.sendEvent("onBrowserCreated",1);
+	} 
+	onSize = function (ltOwner) {
+		var ltCtrl = ltOwner.getCtrl();
+		if( ltCtrl ) {
+			ltCtrl.adjust(0,0,0);
+		}
+	}
+}
+
+wbLayout.html = /**
+<!doctype html>
+<html>
+<head>
+    <style type="text/css">
+    html,body{ height:100%; margin:0;font-size:12px; } 
+     
+    #header{
+        padding:10px;
+    }
+     
+    #header input#keyword{
+        font-size:16px;
+        width:1000%%;
+        text-align:right;
+    }
+     
+    #header button#search{
+        padding:4px 25px;
+        font-size:16px; 
+        background:rgb(27,174,93);
+        color:white; 
+    }
+     
+    #header button#search:hover { 
+        background:rgb(33,127,188);
+        outline: 1px glow rgb(91,171,230) 1px;
+        cursor:pointer;
+    } 
+     
+    #container{
+        height:100%%;
+        overflow:auto;
+    }
+     
+    .search-result-row{
+        margin:10px;
+    }
+     
+    .search-result-row .title{
+        font-size:16px;
+    }
+     
+    .search-result-row .content b{
+        color:red;
+    }
+     
+    .search-result-row .url a{
+        color:#008000;
+    }
+     
+    #footer{
+        background:#ccc;
+        font-size:14px;
+        text-align:right;
+        padding:2px 50px 2px auto;
+    }
+    </style>
+</head>
+<body>
+    <div id="header"> <input type="text" id="keyword" value=""> <button id="search">搜索</button></div>
+    <div id="container"><div style="padding:20px;font-size:16px;">
+    <a href="http://www.haosou.com/s?q=aardio&src=srp&fr=bbs.aardio.com&rg=1&site=aardio.com">在浏览器中打开好搜站内搜索</a><br><br>
+    <a href="http://update.aardio.com/search?q=aardio">在浏览器中打开官网搜索</a>  - 在aardio代码编辑器中选中要搜索的内容,按F1帮助键可直接搜索相关文章</div></div>
+    <div id="footer"><img src='http://cdn.uehtml.com/201402/1392662521354.gif' style="width:0;height:0;" cache></div> 
+</body>
+</html>
+**/
+
+//默认回车键搜索
+winform.isDialogMessage = function(hwnd,msg){
+    if(  msg.wParam == 0xD/*_VK_RETURN*/ || msg.wParam == 0x1B/*_VK_ESC*/){
+        wbLayout.getEle("search").click();
+        return true;
+    } 
+}
+ 
+ 
+search = function(keyword,start,pages) {
+ 
+    import web.rest.jsonLiteClient; 
+    var googleClient = web.rest.jsonLiteClient();
+    
+    //感谢google,感谢360提供的公共库CDN
+    var ajaxSearch = googleClient.declareApi("http://ajax.useso.com/ajax/services/search/web?v=1.0")
+ 
+    var searchData = ajaxSearch.get( 
+        hl = "zh-CN"; //界面语言:简体中文
+        lr = "lang_zh-CN|lang_zh-TW"; //Language Restrict 只显示指定语言的搜索结果
+        sourceid=cnhp;//搜索来源
+        q = keyword + " site:aardio.com";//搜索关键词
+        start = start;//开始索引
+        rsz = pages;//分页大小
+    ); 
+ 
+    if( searchData[["responseStatus"]] = 200 ){ 
+         
+        var responseData = searchData.responseData;
+         
+        import string.template;
+        var rowTemplate = string.template();
+        rowTemplate.template = /***
+        <div class="search-result-row">
+                <div class="title"><a href="${unescapedUrl}">${title}</a></div>
+                <div class="content"> ${content} </div>
+                <div class="url"><a href="${url}">${visibleUrl}</a></div>
+        </div>
+        ***/
+       
+         
+        var tab = {};
+        table.push(tab, rowTemplate.format( 
+        	title = "更多搜索结果......";
+        	unescapedUrl = "http://update.aardio.com/search?q=" + inet.url.encode(keyword);
+        	content = "点击此链接使用论坛搜索引擎搜索此关键字";
+        	url = "http://update.aardio.com/search?q=" + inet.url.encode(keyword);
+        	visibleUrl = "http://update.aardio.com/search?q=" + keyword;
+         ) )
+         
+        for(i=1;#responseData.results;1){ 
+            table.push(tab, rowTemplate.format( responseData.results[i] ) )
+        }
+         
+        var html =  string.replace( string.join(tab),"@\u003cb\u003e","<b>");
+        html = string.replace( html,"@\u003c/b\u003e","</b>") 
+         
+        var tPages = {} 
+        for(i=1;#responseData.cursor.pages;1){
+            if( responseData.cursor.pages[i].start == start ){
+                table.push(tPages,tostring(i) );
+            }
+            else{
+                table.push(tPages,..string.format("<a href='' name='pageslink' start='%d' keyword='%s' pages='%d'>%s</a>"
+                    ,responseData.cursor.pages[i].start,inet.url.encode(keyword) ,pages : 8,responseData.cursor.pages[i].label) )
+            }
+        }
+         
+        var htmlPages =  '<div class="search-result-pages">' + string.join( tPages," | ") + '</div>';
+        return html,htmlPages,keyword; 
+    } 
+    else { 
+    	return '<widget cls="static"  style="behavior:webBrowser;width:100%%;height:100%%;"></widget> ',,keyword;
+    	
+        var errmsg = searchData[["responseDetails"]] : "网络错误"
+        if( string.find( errmsg,"Suspected Terms of Service Abuse") ) errmsg = "服务器忙,请稍候再试!";
+         
+        return ..string.format('<div class="search-result-row"><div class="content"> %s </div> </div>', errmsg ) ;
+    }
+     
+}
+ 
+wbLayout.sinking = {
+    onHyperlinkClick = { 
+        pageslink = function (ltTarget,ltOwner,reason,behaviorParams) {
+         
+            import inet.url;
+             
+            wbLayout.getEle("container").innerHTML = "<img src='http://cdn.uehtml.com/201402/1392662521354.gif'>"
+            wbLayout.getEle("footer").innerHTML = "";
+             
+            var html,htmlPages,keyword = win.invoke(search,inet.url.decode(ltTarget.keyword),tonumber(ltTarget.start),tonumber(ltTarget.pages))
+ 			winform.keyword = keyword;
+            if( htmlPages ){ 
+            	wbLayout.getEle("container").innerHTML = html;
+            	wbLayout.getEle("footer").innerHTML = htmlPages;
+            }
+            else {  
+            	wbLayout.getEle("container").innerHTML = html;
+            }
+            
+            return true;
+        }
+        default = function(ltTarget,ltOwner,reason,behaviorParams){
+            import process;
+            process.execute(ltTarget.href);
+            return true;
+        }
+         
+    } 
+}
+ 
+wbLayout.onButtonClick = {
+ 
+    search = function (ltTarget,ltOwner,reason,behaviorParams) {
+     
+        wbLayout.getEle("container").innerHTML = "<img src='http://cdn.uehtml.com/201402/1392662521354.gif'>"
+        wbLayout.getEle("footer").innerHTML = "";
+
+        var html,htmlPages,keyword = win.invoke(search,wbLayout.getEle("keyword").value,0,8) 
+        winform.keyword = keyword;
+
+        if( htmlPages ){ 
+            wbLayout.getEle("container").innerHTML = html;
+            wbLayout.getEle("footer").innerHTML = htmlPages;
+        }
+        else {  
+            wbLayout.getEle("container").innerHTML = html;
+        }  
+    }
+}
+ 
+winform.show(true)
+wbLayout.getEle("keyword").xcall("selectAll",true);//全选
+win.loopMessage();

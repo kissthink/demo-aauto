@@ -1,0 +1,14 @@
+//gzip解压缩
+
+import zlib;
+import inet.http; 
+import console;
+console.log("正在下载gzip数据")
+
+var http = inet.http();
+var str = http.get("http://httpbin.org/gzip","Accept-Encoding:gzip, deflate") 
+ 
+str = zlib.gzUncompress(str)
+console.log(str)
+console.pause()
+ 

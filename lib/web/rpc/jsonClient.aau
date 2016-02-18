@@ -1,0 +1,135 @@
+//jsonClient 客户端
+import web.json;
+import inet.http; 
+import inet.httpStatusCode;
+
+namespace web.rpc; 
+
+class jsonClient {
+	ctor( url, ... ) { 
+		this.url = url;
+		this._http = ..inet.http(...);
+		this.charset = "UTF-8"; 
+		this.version = "2.0"
+	}; 
+	setAuth = function(user,pwd){
+		this._http.username = user;
+		this._http.password = pwd;
+	};
+	request = function( paramsData ){
+		this.lastResponseData = null;
+		this.lastStatusCode = null;
+		this._http.beforeSend = this[["beforeSend"]];
+		this._http.afterSend = this[["afterSend"]]; 
+
+		var ret,errMsg,errCode = this._http.down( this.url,..web.json.stringify(paramsData)
+			,'\r\nContent-Type:application/json-rpc',,"application/json,text/json,*/*","POST" ); 
+		this.lastStatusCode = this._http.statusCode; 
+		this.transData = null;
+		if( paramsData.id === null && !#paramsData ){
+			return;
+		}
+
+		if( ret ) {
+			this.lastResponseData = ret;
+			if( ret == "" ) return ret;
+			return ..web.json.parse(ret);  
+		}
+		else {
+			var utf8 = ..string.cmp("UTF-8",this.charset ) == 0; 
+			if( utf8 && type(errMsg) == type.string ) errMsg = ..string.fromto( errMsg,65001,0); 
+			this.lastResponseData = errMsg;
+			return null,errMsg,errCode;
+		}
+	}; 
+	_invoke = function(method,params,id){   
+		var paramsData = {
+			jsonrpc = owner.version;
+			method = method;
+			params = params;
+			id = id;
+		}
+		
+		if( this[["transData"]]  ){
+			..table.push(this.transData,paramsData);
+			return;
+		} 
+		return owner.request( paramsData )
+	};
+	notify = function(method,params){
+		return this._invoke(method,params,null)
+	};
+	invoke = function(method,params,id){
+		if( id === null ){
+			if(this[["transData"]])
+				id = #this.transData + 1;
+			else 
+				id = method;
+		}
+		return this._invoke(method,params,id)
+	};
+	beginTrans = function(){
+		this.transData = {};
+	};
+	commitTrans = function(){
+		return owner.request( this.transData  )
+	};
+	lastStatusMessage = function(){
+		if(this.lastStatusCode)return ..inet.httpStatusCode[this.lastStatusCode],this.lastStatusCode;
+	};
+	lastResponse = function(){ 
+		var s = this[["lastResponseData"]];
+		if( ..console && _STUDIO_INVOKED ) ..console.log(s) else ..io.print(s);
+		return s;
+	};
+	close = function(){
+		this._http.close();
+	};
+	@_meta
+}
+
+namespace jsonClient { 
+  
+	_httpStatusCode = ..inet.httpStatusCode; 
+	_meta = {
+		_get = function( k ){  
+			if( type(k) == "string" && k[1]=='_'# ) return;  
+			k = tostring(k);  if(!k) return; 
+			
+			owner[[k]] = function(...){
+				return owner.invoke( k,{...},k )
+			} 
+			return owner[[k]]; 
+		}  
+	} 
+}
+ 
+/**intellisense()
+web.rpc.jsonClient = JSON-RPC客户端\n协议版本2.0
+web.rpc.jsonClient("__/*服务端网址*/") = 创建REST客户端 
+web.rpc.jsonClient() = !web_rpcJsonClient. 
+!web_rpcJsonClient.charset = 获取或修改编码,\n默认为"UTF-8" 
+!web_rpcJsonClient.setAuth(.("用户名","密码") = 设置HTTP登录用户名,密码 
+!web_rpcJsonClient.lastStatusCode = 获取最近一次请求返回的HTTP状态码\n100 ~ 101 为信息提示\n200 ~ 206 表示请求成功\n300 ~ 305 表示重定向\n400 ~ 415 表求客户端请求出错\n500 ~ 505 表示服务端错误
+!web_rpcJsonClient.lastStatusMessage() = 获取最近返回的HTTP状态码文本描述\n第二个返回值为状态码
+!web_rpcJsonClient.lastResponse() = 获取最后一次服务器返回的原始数据,\n如果控制台已打开或在开发环境中导入console库则在控制台输出数据\n下载文件时该值为空
+!web_rpcJsonClient._http = !whttp.
+!web_rpcJsonClient.close() = 关闭对象释放资源
+!web_rpcJsonClient.beforeSend = @.beforeSend = function(){
+	__/*已准备向服务器发送数据触发此回调函数*/ 
+}
+!web_rpcJsonClient.afterSend = @.afterSend = function(statusCode,contentLength){
+	__/*向服务器发送数据结束触发此回调函数*/ 
+}
+!web_rpcJsonClient.beginTrans() = 开始批量调用
+!web_rpcJsonClient.commitTrans() = 完成批量调用 
+!web_rpcJsonClient.notify(.（"函数名",参数表) =  发送远程通知,无返回值,\n参数表可以是数组,也可以是命名参数表
+!web_rpcJsonClient.invoke(.（"函数名",参数表,id) = 调用远程函数,id为可选参数,\n参数表可以是数组,也可以是命名参数表,\n也可以不使用invoke直接使用函数名调用,这种形式参数将合并为数组
+!web_rpcJsonClient.invoke() = !jsonrpcresponse.
+!jsonrpcresponse.result = 返回值
+!jsonrpcresponse.error = 错误信息,该值与result不能同时非空
+!jsonrpcresponse.error.message = 错误描述
+!jsonrpcresponse.error.code = 错误代码
+!jsonrpcresponse.error.data = 错误数据
+!jsonrpcresponse.id = 调用ID
+end intellisense**/ 

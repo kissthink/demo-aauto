@@ -1,0 +1,55 @@
+import win.ui;
+/*DSG{{*/
+var mainForm = ..win.form(text="选项卡控件演示";right=663;bottom=387)
+mainForm.add(
+tab={cls="tab";left=14;top=16;right=645;bottom=360;z=1}
+)
+/*}}*/
+
+/*
+请参考教程《使用选项卡控件》
+http://bbs.aau.cn/forum.php?mod=viewthread&tid=13156&from=portal
+
+TAB选项控件的一个子页面实际上就是一个普通的窗体，可以使用窗体设计器生成，步骤如下：
+----------------------------------------------------------------
+1、新建工程文件，在主窗口上拖放一个tab选项卡控件。
+2、在工程文件管理器中新建子窗口文件 /res/frmTabPage1.aau,/res/frmTabPage2.aau ....等等
+3、将子窗口文件拖动到主窗口中会自动生成以下代码
+mainForm.loadForm("\res\frmTabPage1.aau");
+mainForm.loadForm("\res\frmTabPage2.aau");
+
+将该代码修改为加载到tab选项卡中，如下
+mainForm.tab.loadForm("\res\frmTabPage1.aau");
+mainForm.tab.loadForm("\res\frmTabPage2.aau");
+----------------------------------------------------------------
+
+tab子窗口并不需要与tab控件保持大小完全一致，不需要去计算坐标。
+aardio窗体设计器可以通过控件的【固定边距】【自适应大小】等属性设置控件在运行时位置保持不变、或自动调整适应窗口大小。 
+*/
+
+//因为此范例是单文件，下面把\res\frmTabPage1.aau的代码直接复制了过来，  
+var frmTabPage1 = mainForm.tab.add/*win.form*/( text="选项"; bottom=140;right=325 )
+frmTabPage1.add( 
+	button={ bottom=49;text="你好";left=36;right=135;top=21;z=1;cls="button" } 
+) 
+frmTabPage1.button.oncommand = function(id,event){
+	frmTabPage1.msgbox( frmTabPage1.button.text,"也可以使用回调函数" ); 
+} 
+
+//因为此范例是单文件，下面把\res\frmTabPage2.aau"的代码直接复制了过来，
+var frmTabPage2 = mainForm.tab.add/*win.form*/( text="点这里";bottom=140;right=325  )
+frmTabPage2.add( 
+button={ bottom=49;text="Hello";left=36;right=135;top=21;z=1;cls="button" }
+) 
+frmTabPage2.button.oncommand = function(id,event){
+	frmTabPage2.msgbox( frmTabPage2.button.text,"Hello!" ); 
+} 
+
+//切换选项卡时触发此事件
+mainForm.tab.onnotify = function(id,code,ptr){
+	if(code==0xFFFFFDD9/*_TCN_SELCHANGE*/) 
+		mainForm.msgbox("切换选项卡") 
+} 
+
+mainForm.show(true) 
+win.loopMessage();

@@ -1,0 +1,87 @@
+//server 服务端
+import wsock.err; 
+import wsock.tcp.client;
+namespace wsock.tcp;
+
+class server{
+	ctor(ip,port,backlog){
+		if(! ..wsock.open() ){ 
+			error( ( ..wsock.err.lasterr() ),2 ) 
+		}
+		 
+		var hSocket= ..wsock.socket(0x2/*_AF_INET*/,0x1/*_SOCK_STREAM 建立流式套接口*/,0x6/*_IPPROTO_TCP*/ )
+		if( hSocket = _INVALID_SOCKET ){ 
+			..wsock.close() //关闭wsock
+			return null,..wsock.err.lasterr();
+		} 
+		this._handle = hSocket;  
+		this._serverAddress = ..wsock.sockaddr_in();  
+		
+		this.bind = function(ip,port){
+			var service = ..wsock.sockaddr_in( ip,port : 0 ); 
+			service.sin_family = 0x2/*_AF_INET*/ 
+			if ..wsock.bind( this._handle,service,..raw.sizeof(service)) =-1/*_SOCKET_ERROR*/	{ 
+				return null, ..wsock.err.lasterr() ;
+			} 
+			..wsock.getsockname(this._handle, this._serverAddress,..raw.sizeof(this._serverAddress) );
+			return true;
+		}
+		this.listen = function(backlog){ 
+			if( ..wsock.listen(this._handle,backlog)=-1/*_SOCKET_ERROR*/){
+				return null, ..wsock.err.lasterr() ;
+			}
+			return true;
+		};
+		if( ip ){
+			var ok,err = this.bind (ip,port);
+			if( ! ok ){
+				..wsock.closesocket(this._handle); 
+				..wsock.close() //关闭wsock
+				return null,err;
+			}
+			
+			var ok,err = this.listen ( backlog : 1 );
+			if( ! ok ){
+				..wsock.closesocket(this._handle); 
+				..wsock.close() //关闭wsock
+				return null,err;
+			}
+		}
+		
+		this.getLocalIp = function(){
+			return ..wsock.inet_ntoa(this._serverAddress.sin_addr),::Ws2_32.ntohs( this._serverAddress.sin_port );
+		};
+	};
+	forever = function(handle){
+		if( type(handle) != type.function ) error("参数@1必须是一个函数对象",2);
+	 
+		while( true ){
+			var acceptSocket = ..wsock.accept(this._handle)
+			if( acceptSocket!= _INVALID_SOCKET ){ 
+				this.lastRequestSocket = acceptSocket;
+				if( handle(acceptSocket) ===  false ){
+					break;
+				}
+			}
+		}
+		 
+		..wsock.closesocket(this._handle); 
+		..wsock.close();
+	};
+}
+
+/*
+http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+*/
+
+/**intellisense()
+wsock.tcp.server = TCP服务端
+wsock.tcp.server(.(IP,端口,请求队列大小) = 创建TCP服务端,\n所有参数可选,端口为0或省略则自动选择未用端口\n注意0-1023为系统通用服务保留端口,\n1024-49151为用户服务端口,其中大约%9已由IANA注册分配\n49152-65535为私有或临时端口
+wsock.tcp.server() = !stdwsocktcpserver.
+!stdwsocktcpserver.bind(.(IP,端口) = 绑定IP端口
+!stdwsocktcpserver.listen(.(请求队列大小) = 监听指定的IP端口
+!stdwsocktcpserver.close() = 关闭服务端
+!stdwsocktcpserver.getLocalIp() = 返回当前绑定的IP,端口号
+!stdwsocktcpserver.forever(回调函数) = @.forever(\n	function(acceptSocket){\n		var request = wsock.tcp.client(,acceptSocket)\n	}\n)	
+!stdwsocktcpserver._serverAddress = 服务端监听地址\n!sockaddr_in.
+end intellisense**/

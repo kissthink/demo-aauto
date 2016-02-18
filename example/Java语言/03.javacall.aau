@@ -1,0 +1,27 @@
+//3、调用Java对象
+
+import console;
+import java; 
+
+var jvm = java();
+
+/*
+创建java类实例,并调用其成员方法,
+注意java会到 "默认类搜寻路径" + "/java/aardio/sample/HelloworldApp.class" 去查找 aardio.sample.HelloworldApp
+与aardio中的库类似名字空间与类文件路径一致，"默认类搜寻路径"为"/java/"以及"/java/*.jar"
+*/
+var helloworld = jvm.newJavaObject( "aardio.sample.HelloworldApp","void()" );
+	
+//获取对象成员方法
+var obj_name = helloworld.getField( "name","string" ) ;
+console.log( obj_name )
+
+//获取类静态成员
+var class_static_num  = jvm.getClassField(  
+	"aardio.sample.HelloworldApp", //类名
+	"static_num",//字段名
+	"int" //数据类型
+);
+console.log( class_static_num )
+
+console.pause();

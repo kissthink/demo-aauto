@@ -1,0 +1,104 @@
+//monitor 显示器
+namespace sys.monitor;
+
+GetMonitorInfo = ::User32.api( "GetMonitorInfo", "bool(pointer hMonitor,struct & lpmi)");
+MonitorFromWindow = ::User32.api( "MonitorFromWindow", "pointer(addr hwnd,INT dwFlags)");
+ 
+class MONITORINFO  {         
+    int cbSize = 40; 
+    struct rcMonitor = {
+    	int left;
+		int top;
+		int right;
+		int bottom;
+	} ;       
+    struct rcWork = {
+    	int left;
+		int top;
+		int right;
+		int bottom;
+	}
+
+    int dwFlags;
+}
+
+getInfoFromWindow = function(hwnd=0,flag = 2/*_MONITOR_DEFAULTTONEAREST*/){
+	var hPmi = MonitorFromWindow( hwnd ,flag )
+	if( hPmi ){
+		var info = MONITORINFO();
+		if( GetMonitorInfo( hPmi,info ) ){
+			return info;
+		}
+	}
+}
+
+class DEVMODE_DISPLAY_DEVICE{
+  BYTE deviceName[0x20/*_CCHDEVICENAME*/];
+  WORD specVersion;
+  WORD driverVersion;
+  WORD size = 156;
+  WORD driverExtra;
+  INT fields;
+  struct position = {INT x;INT y;}
+  INT displayOrientation;
+  INT displayFixedOutput;
+  word color;
+  word duplex;
+  word yResolution;
+  word ttOption;
+  word collate;
+  BYTE formName[0x20/*_CCHFORMNAME*/];
+  WORD logPixels;
+  INT bitsPerPel;
+  INT pelsWidth;
+  INT pelsHeight;
+  INT displayFlags;
+  INT displayFrequency;
+  INT icmMethod;
+  INT icmIntent;
+  INT mediaType;
+  INT ditherType;
+  INT reserved1;
+  INT reserved2;
+  INT panningWidth;
+  INT panningHeight;
+} 
+
+eachMode = function(flags,idx){
+	idx := 0;
+	var devMode = DEVMODE_DISPLAY_DEVICE();
+	return function(){
+		if(  ::User32.EnumDisplaySettingsEx(null,idx,devMode,flags) ){
+			idx++;
+			return devMode;
+		}
+	}
+}
+
+ /**intellisense()
+sys.monitor.getInfoFromWindow(.(窗口句柄,_MONITOR_DEFAULTTONEAREST) = 获取窗口所在显示器信息,\所有参数可选
+sys.monitor.getInfoFromWindow() = !MONITORINFO.
+!MONITORINFO.rcMonitor = 显示器的在屏幕坐标系中的矩形\n!rect.
+!MONITORINFO.rcWork = 显示器的工作区域\n!rect.
+sys.monitor.eachMode(flags,idx) = @for( devMode in sys.monitor.eachMode() ){
+	if( devMode.pelsWidth > (devMode.pelsWidth > devMode.pelsHeight ? 640 : 480) ){
+		__
+	}
+}
+sys.monitor.eachMode() = !DEVMODE_DISPLAY_DEVICE.
+!DEVMODE_DISPLAY_DEVICE.dmPelsWidth = 像素宽度
+!DEVMODE_DISPLAY_DEVICE.pelsHeight = 像素高度
+!DEVMODE_DISPLAY_DEVICE.bitsPerPel = 像素位宽
+!DEVMODE_DISPLAY_DEVICE.displayOrientation = 显示方向,参考_DMDO_ 前缀常量
+!DEVMODE_DISPLAY_DEVICE.displayFrequency = 刷新频率
+_MONITOR_DEFAULTTONULL=@0/*_MONITOR_DEFAULTTONULL*/
+_MONITOR_DEFAULTTOPRIMARY=@1/*_MONITOR_DEFAULTTOPRIMARY*/
+_MONITOR_DEFAULTTONEAREST=@2/*_MONITOR_DEFAULTTONEAREST*/
+_DMDO_DEFAULT=@0/*_DMDO_DEFAULT*/
+_DMDO_90=@0x1/*_DMDO_90*/
+_DMDO_180=@0x2/*_DMDO_180*/
+_DMDO_270=@0x3/*_DMDO_270*/
+_ENUM_CURRENT_SETTINGS=@-1/*_ENUM_CURRENT_SETTINGS*/
+_ENUM_REGISTRY_SETTINGS=@-2/*_ENUM_REGISTRY_SETTINGS*/
+_EDS_RAWMODE=@0x2/*_EDS_RAWMODE*/
+end intellisense**/

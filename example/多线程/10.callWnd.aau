@@ -1,0 +1,16 @@
+//10、调用界面线程窗口函数
+import win.ui;
+/*DSG{{*/
+var winform = ..win.form(text="aardio form";right=600;bottom=400;parent=...)
+winform.add()
+/*}}*/
+
+thread.invoke( 
+	function( hwnd ){
+		//如果在其他语言实现的DLL组件中调用aardio窗口函数，可以参考此目录下的_WM_THREAD_CALLBACK范例
+		thread.callWnd(hwnd, "show", 0x3/*_SW_MAXIMIZE*/ );
+	}, winform.hwnd
+)
+ 
+win.loopMessage();
+return winform;

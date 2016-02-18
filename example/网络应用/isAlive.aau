@@ -1,0 +1,14 @@
+//检测网络连接
+import inet.ras;
+
+var ras,lan = inet.ras.isAlive()
+
+io.open()
+
+if( lan )
+	io.print("检测到本地连接")
+else if( ras )
+	io.print("检测到远程连接")
+else 
+	io.print("没有联网")	
+execute("pause")

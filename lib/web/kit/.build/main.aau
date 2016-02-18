@@ -1,0 +1,23 @@
+import ide;
+import fsys;
+
+var publisDir = ide.getPublisDir();
+if(!#publisDir)return; 
+
+var wkePubDir =  fsys.joinpath(publisDir,"\lib\web\kit\.dll\" ); 
+if( ! io.exist(wkePubDir) ){ 
+	var libPath,libDir = io.libpath("web.kit")
+	
+	var pluginsDir = fsys.joinpath(publisDir,"\lib\web\kit\.dll\plugins" ); 
+	..fsys.createDir(pluginsDir);
+	
+	import win;
+	if( ..win.msgboxTest("是否需要复制Flash插件(5.98MB)到发布文件目录?
+如果您的网页未使用Flash插件,建议点击取消以减小发布文件体积。","aardio - web.kit扩展库发布工具",ide.getMainHwnd()) ){
+		..fsys.copy( fsys.joinpath(libDir,"\.dll\plugins\*") ,pluginsDir,0x10/*_FOF_NOCONFIRMATION*/  | 0x200/*_FOF_NOCONFIRMMKDIR*/);
+	} 
+	..fsys.copy( fsys.joinpath(libDir,"\.dll\wke.dll") ,wkePubDir,0x10/*_FOF_NOCONFIRMATION*/  | 0x200/*_FOF_NOCONFIRMMKDIR*/);
+	..fsys.copy( fsys.joinpath(libDir,"\.dll\wkex.dll") ,wkePubDir,0x10/*_FOF_NOCONFIRMATION*/  | 0x200/*_FOF_NOCONFIRMMKDIR*/);
+	
+	..fsys.createDir( fsys.joinpath(publisDir,"plugins") ); 
+}

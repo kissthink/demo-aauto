@@ -1,0 +1,11 @@
+//获取网卡列表
+import console;
+import inet.adapter
+
+for adptInfo in inet.adapter.each() { 
+	console.log(adptInfo.mac)
+	console.log(adptInfo.adapterName);
+	console.log(adptInfo.ipAddressList.ipAddress )
+}
+
+console.pause()

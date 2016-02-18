@@ -1,0 +1,54 @@
+import web.json;
+import web.rest.client;
+import string.conv;
+namespace web.rest; 
+
+class jsonClient{
+	ctor( ... ){
+		this = ..web.rest.client( ... ); 
+		this.stringifyRequestParameters = stringifyRequestParameters;
+		this.parseResponseResult = function(s,codepage){
+			if( s="" ) return s;
+			var t = this._http.responseContentType;
+			if( t &&  ..string.match( t,"[\w\/]*<@@json@>![\W]"  ) )
+				return ..string.conv.localized(  ..web.json.parse(s,true,this.codepage),this.codepage );
+				
+			s = ..string.trim(s);
+			if( s[1] == '{'# || s[1] == '['# || ( this._http.statusCode = 200 ) ){
+				return  ..string.conv.localized( ..web.json.parse(s,true,this.codepage),this.codepage );
+			}
+			return;
+		}
+		;
+		this.contentType = "application/json";  
+		this.defaultContentType = "application/json";
+		this.acceptType = "application/json,text/json,*/*";
+	}; 
+	lastResponse = function(){
+		var s = this.lastResponseData;
+		if( s ){
+			s = ..string.trim(s);
+		 	if( s[1] == '{'# || s[1] == '['# && (!this._http.lastReadErrCode ) ){
+		 		s = ..web.json.stringify( ..string.conv.localized( ..web.json.parse(s,true,this.codepage),this.codepage ) ,true);
+		 	}
+		 	if( ..console && _STUDIO_INVOKED ) ..console.log(s) else ..io.print(s);
+		 	return s;
+		}
+	};
+}
+
+namespace jsonClient { 
+
+	var fromto = ..string.fromto;  
+	
+	var stringify = ..web.json.stringify;
+	stringifyRequestParameters = function(param,utf8){
+		param = stringify(param,false,true); //转换为UNICODE
+		return param;
+	} 
+}
+
+/**intellisense()
+web.rest.jsonClient = REST客户端\n请求数据,返回数据都使用JSON格式
+web.rest.jsonClient() = 创建REST客户端,\n!web_restClient.
+end intellisense**/
