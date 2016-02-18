@@ -1,0 +1,48 @@
+import win.ui;
+/*DSG{{*/
+var winform = ..win.form( bgcolor=16777215;bottom=292;parent=...;right=399;border="none";text="HTMLayout  无边框窗口演示" )
+winform.add(  )
+/*}}*/
+
+import web.layout;
+import web.layout.behavior.windowSizer;//支持拖动边框
+import web.layout.behavior.windowCommand;//支持标题栏按钮
+import web.layout.behavior.keyboard;
+ 
+wbLayout = web.layout( winform  )  
+
+if( _STUDIO_INVOKED ){
+	import web.layout.debug;
+	wbLayout.attachEventHandler( web.layout.debug );
+}
+
+wbLayout.go("/layout/fang-qq.html") 
+ 
+import process;
+wbLayout.onButtonClick = {
+	getpassword = function (ltTarget,ltEle,x,y,ltMouseParams) {
+		process.execute("https://aq.qq.com/cn2/findpsw/pc/pc_find_pwd_input_account?source_id=1003&ptlang=2052&aquin=") 
+	}
+	register = function (ltTarget,ltEle,x,y,ltMouseParams) {
+		process.execute("http://zc.qq.com/chs/index.html")
+	}
+}
+
+wbLayout.onSelectSelectionChanged = { 
+	username = function (ltTarget,ltEle,reason,behaviorParams) {
+	 
+		var ltOption = ltEle.queryElement("OPTION:current");
+		var ltNumber = ltOption.queryElement(".number")
+		 
+		ltEle.queryElement("caption").innerText = ltNumber.innerText; 
+	}
+}
+wbLayout.getEle("username").queryElement("caption").innerText = "10000";
+
+//圆角窗口
+import win.util.round;
+win.util.round(winform)
+ 
+winform.show() 
+win.loopMessage();
+return winform;

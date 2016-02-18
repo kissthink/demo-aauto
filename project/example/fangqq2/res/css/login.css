@@ -1,0 +1,24 @@
+@charset "gb2312";
+/*
+ *	µÇÂ½½çÃæ
+ *	Date		2011-11-02
+ *	Author		NinJa911
+ *	Homepage	http://www.ninja911.com
+ *	Email		ninja911@qq.com
+ *	QQ			576503582
+ */
+.login {width:350px; height:286px; overflow:hidden;}
+.login .header {width:350px; height:120px; overflow:hidden; background:url(../images/login_header.jpg) no-repeat;}
+.login .header .space {height:26px;}
+.login .header .banner {width:350px; height:80px; overflow:hidden;}
+
+.login .main {width:350px;}
+.login .main form .form_list {width:340px; height:94px; margin:0 auto; overflow:hidden;}
+.login .main form .form_list .left {width:220px; height:94px; overflow:hidden;}
+.login .main form .form_list .right {width:120px; padding-top:14px;}
+.login .main form .form_validate {width:340px; padding-left:40px; display:none;}
+#validate_box {display:none;}
+
+#qq_validate_img {border:1px #666 solid;}
+.ref_validate {color:#0B8CCA !important;}
+.ref_validate:hover {color:#0D4277 !important;}

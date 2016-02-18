@@ -1,0 +1,47 @@
+import win.ui;
+/*DSG{{*/
+mainForm = ..win.form(text="ReportX 测试";right=600;bottom=400;parent=...)
+mainForm.add()
+/*}}*/
+
+import com.lite;
+var ReportX = com.lite("/ReportX.ocx")
+var rep = ReportX.createEmbed(mainForm,"{A5DA6E97-1D4C-4708-B705-84A45716B4DD}")
+var repObject = rep._object;
+ 
+//调用ReportX报表方法
+//repObject.OpenReport( io.fullpath("/Example/预算计划比较.rpxe"));
+repObject.RowCount=15;
+repObject.ColCount=5;
+var testTab={
+    {"客户1";"工地1";"等级1";"产品1"};
+    {"客户1";"工地1";"等级1";"产品2"};
+    {"客户1";"工地2";"等级1";"产品2"};
+    {"客户1";"工地2";"等级1";"产品2"};
+    {"客户1";"工地2";"等级1";"产品3"};
+    {"客户2";"工地2";"等级1";"产品1"};
+    {"客户2";"工地2";"等级2";"产品2"};
+    {"客户2";"工地2";"等级2";"产品3"};
+    {"客户2";"工地3";"等级1";"产品3"};
+    {"客户2";"工地3";"等级1";"产品3"};
+    {"客户2";"工地3";"等级1";"产品3"};
+    {"客户3";"工地3";"等级1";"产品4"};  
+};
+
+for(i=1; #testTab; 1) {
+	for(j=1;#testTab[i];1){
+		repObject.SetCellValue(j,i,testTab[i][j]);  
+	}
+}
+
+
+
+//响应ReportX报表事件
+/*
+rep.OnCellChanged = function(aCol,aRow,aCellValue ){ 
+	mainForm.text = string.format("行:%d 列:%d 值:%s", aCol,aRow,aCellValue)
+}
+*/
+
+mainForm.show() 
+win.loopMessage(); 

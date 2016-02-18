@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="gb2312"?>
+<project ver="0.60" name="fang-qq" libEmbed="true" icon="qq.ico" CompanyName="" FileDescription="" LegalCopyright="" ProductName="" InternalName="" FileVersion="0.0.1.001" ProductVersion="0.0.1.001" publishDir="/Publish/" ui="win" output="fang-qq.exe">
+	<file name="main.aau" path="main.aau"/>
+	<folder name="资源文件(web.layout)" path="layout" comment="" embed="true">
+		<file name="fang-qq.html" path="layout\fang-qq.html" comment="layout\fang-qq.html"/>
+		<folder name="styles" path="layout\styles" comment="layout\styles">
+			<file name="fang-qq.css" path="layout\styles\fang-qq.css" comment="layout\styles\fang-qq.css"/>
+			<folder name="images" path="layout\styles\images" comment="layout\styles\images">
+				<file name="photo.png" path="layout\styles\images\photo.png" comment="layout\styles\images\photo.png"/>
+				<file name="password.png" path="layout\styles\images\password.png" comment="layout\styles\images\password.png"/>
+				<file name="logo1.png" path="layout\styles\images\logo1.png" comment="layout\styles\images\logo1.png"/>
+				<file name="logo.png" path="layout\styles\images\logo.png" comment="layout\styles\images\logo.png"/>
+				<file name="keypad1.png" path="layout\styles\images\keypad1.png" comment="layout\styles\images\keypad1.png"/>
+				<file name="keypad.png" path="layout\styles\images\keypad.png" comment="layout\styles\images\keypad.png"/>
+				<file name="keyboard.png" path="layout\styles\images\keyboard.png" comment="layout\styles\images\keyboard.png"/>
+				<file name="kb.png" path="layout\styles\images\kb.png" comment="layout\styles\images\kb.png"/>
+				<file name="Input-box.png" path="layout\styles\images\Input-box.png" comment="layout\styles\images\Input-box.png"/>
+				<file name="cipher2.png" path="layout\styles\images\cipher2.png" comment="layout\styles\images\cipher2.png"/>
+				<file name="cipher.png" path="layout\styles\images\cipher.png" comment="layout\styles\images\cipher.png"/>
+				<file name="caption-buttons.png" path="layout\styles\images\caption-buttons.png" comment="layout\styles\images\caption-buttons.png"/>
+				<file name="caption-buttons-hover2.png" path="layout\styles\images\caption-buttons-hover2.png" comment="layout\styles\images\caption-buttons-hover2.png"/>
+				<file name="caption-buttons-hover1.png" path="layout\styles\images\caption-buttons-hover1.png" comment="layout\styles\images\caption-buttons-hover1.png"/>
+				<file name="caption-buttons-hover.png" path="layout\styles\images\caption-buttons-hover.png" comment="layout\styles\images\caption-buttons-hover.png"/>
+				<file name="caption-buttons-active2.png" path="layout\styles\images\caption-buttons-active2.png" comment="layout\styles\images\caption-buttons-active2.png"/>
+				<file name="caption-buttons-active1.png" path="layout\styles\images\caption-buttons-active1.png" comment="layout\styles\images\caption-buttons-active1.png"/>
+				<file name="caption-buttons-active.png" path="layout\styles\images\caption-buttons-active.png" comment="layout\styles\images\caption-buttons-active.png"/>
+				<file name="button6.png" path="layout\styles\images\button6.png" comment="layout\styles\images\button6.png"/>
+				<file name="button5.png" path="layout\styles\images\button5.png" comment="layout\styles\images\button5.png"/>
+				<file name="button4.png" path="layout\styles\images\button4.png" comment="layout\styles\images\button4.png"/>
+				<file name="button3.png" path="layout\styles\images\button3.png" comment="layout\styles\images\button3.png"/>
+				<file name="button2.png" path="layout\styles\images\button2.png" comment="layout\styles\images\button2.png"/>
+				<file name="button.png" path="layout\styles\images\button.png" comment="layout\styles\images\button.png"/>
+				<file name="background.png" path="layout\styles\images\background.png" comment="layout\styles\images\background.png"/>
+			</folder>
+		</folder>
+	</folder>
+</project>

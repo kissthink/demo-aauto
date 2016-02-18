@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="gb2312"?>
+<project ver="0.60" name="webqq3_form" libEmbed="true" icon="app.ico" CompanyName="W.QQ桌面客户端" FileDescription="采用w.qq.com协议" LegalCopyright="Copyright (C) NinJa911 2011" ProductName="W.QQ桌面客户端" InternalName="W.QQ桌面客户端" FileVersion="1.0.0.03" ProductVersion="1.0.0.03" publishDir="/Publish/" ui="win" output="webqq3_form.exe">
+	<file name="main.aau" path="main.aau"/>
+	<folder name="资源文件" path="res" embed="true">
+		<file name="login.htm" path="res\login.htm" comment="res\login.htm"/>
+		<folder name="css" path="res\css" comment="res\css">
+			<file name="login.css" path="res\css\login.css" comment="res\css\login.css"/>
+			<file name="global.css" path="res\css\global.css" comment="res\css\global.css"/>
+		</folder>
+		<folder name="images" path="res\images" comment="res\images">
+			<file name="validate.jpg" path="res\images\validate.jpg" comment="res\images\validate.jpg"/>
+			<file name="login_header.jpg" path="res\images\login_header.jpg" comment="res\images\login_header.jpg"/>
+			<file name="button_common_link.png" path="res\images\button_common_link.png" comment="res\images\button_common_link.png"/>
+			<file name="button_common_hover.png" path="res\images\button_common_hover.png" comment="res\images\button_common_hover.png"/>
+			<file name="button.png" path="res\images\button.png" comment="res\images\button.png"/>
+			<folder name="frame" path="res\images\frame" comment="res\images\frame">
+				<file name="website.png" path="res\images\frame\website.png" comment="res\images\frame\website.png"/>
+				<file name="sysmenu.png" path="res\images\frame\sysmenu.png" comment="res\images\frame\sysmenu.png"/>
+				<file name="sysmenu.ico" path="res\images\frame\sysmenu.ico" comment="res\images\frame\sysmenu.ico"/>
+				<file name="restore.png" path="res\images\frame\restore.png" comment="res\images\frame\restore.png"/>
+				<file name="min.png" path="res\images\frame\min.png" comment="res\images\frame\min.png"/>
+				<file name="max.png" path="res\images\frame\max.png" comment="res\images\frame\max.png"/>
+				<file name="close.png" path="res\images\frame\close.png" comment="res\images\frame\close.png"/>
+				<file name="caption.gif" path="res\images\frame\caption.gif" comment="res\images\frame\caption.gif"/>
+				<file name="caption.css" path="res\images\frame\caption.css" comment="res\images\frame\caption.css"/>
+				<file name="button.gif" path="res\images\frame\button.gif" comment="res\images\frame\button.gif"/>
+			</folder>
+		</folder>
+		<folder name="js" path="res\js" comment="res\js" embed="false">
+			<file name="jquery_min.js" path="res\js\jquery_min.js" comment="res\js\jquery_min.js"/>
+		</folder>
+	</folder>
+</project>

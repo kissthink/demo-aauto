@@ -1,0 +1,49 @@
+import web.ui   
+import web.util;
+import process;
+/*DSG{{*/
+var winform = ..win.form(text="Web UI";right=353;bottom=306;border="none";max=false;mode="popup";parent=...;title=false)
+winform.add()
+/*}}*/
+
+//io.open();
+
+winform.text = "W.QQ2011";
+var wb = web.form( winform, 0x4/*_UIFLAG_NO3DBORDER*/ );
+
+wb.showMenu=function(x,y,id,ele){ 
+	return false;//关闭右键菜单
+}
+
+wb.go("/res/login.htm");
+web.ui( wb, 354, 242);	//306
+//web.ui( wb, false);
+wb.jQuery(); 
+
+wb.attachAll(  
+	/* html节点ID = 事件触发函数表 */
+	caption_button_website = {
+		onclick = function(event){
+			process.execute("http://www.uqian.me");
+			//web.util.ieBrowser("http://www.uqian.me")
+		} 
+		onmouseup = function(event){
+			event.srcElement.blur();
+		}
+		
+	}
+);
+
+winform.show(true);
+winform.wndproc = function(hwnd,message,wparam,lparam){
+	select(message) {//判断消息类型
+        case  0x10/*_WM_CLOSE窗口关闭消息*/{
+        	//io.close();
+            win.quitMessage();
+        }
+    }
+}
+
+//进入消息循环
+win.loopMessage();
+return winform,wb;
