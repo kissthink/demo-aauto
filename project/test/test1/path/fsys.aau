@@ -1,0 +1,17 @@
+import console; 
+import fsys;
+
+
+/*==============================
+1.得到当前目录地址
+===============================*/
+dirpath=fsys.getCurDir()
+console.log("dirpath:", dirpath); // 得到的是aardio这个ide的目录地址
+
+/*=========================
+2.
+=========================*/
+
+
+
+console.pause(true);

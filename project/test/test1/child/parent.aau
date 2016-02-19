@@ -1,0 +1,30 @@
+import win.ui;
+/*DSG{{*/
+mainForm = ..win.form(text="aardio form";right=576;bottom=622)
+mainForm.add(
+button={cls="button";text="button";left=94;top=336;right=194;bottom=370;z=1};
+tab={cls="tab";left=81;top=41;right=434;bottom=302;edge=1;z=2}
+)
+/*}}*/
+
+/*==========================
+	窗体里面内置窗体
+============================*/
+
+import thread.command;
+var listener = thread.command();
+listener.print = function( ... ){
+    mainForm.edit.print( ... ) //将线程传过来的参数追加输出到文本框
+} 
+
+
+var child = mainForm.tab.loadForm("/child/childz.aau");
+child.show();
+
+mainForm.button.oncommand = function(id,event){ 
+    mainForm.msgbox(child.gd.getTextMatrix(0,0))
+}
+
+
+mainForm.show() 
+return win.loopMessage(); 

@@ -1,0 +1,13 @@
+import console;
+
+/*==================================
+1.json×ª»¯Îªtable
+===================================*/
+var json = '{"x":"fff", "class":"123","data-clipboard-text":"data-clipboard-text"}';
+var tab = web.json.parse(json, true, 0);
+
+console.pause();
+
+/*==================================
+
+===================================*/

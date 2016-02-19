@@ -1,0 +1,54 @@
+import win; //必须首先导入win窗口支持库
+import win.ui;
+import fsys;
+//import win.ui.menu;
+//import com;
+/*DSG{{*/
+var winform = ..win.form(text="AAuto Form";right=180;bottom=188;parent=...)
+winform.add(
+button={cls="button";text="下一条";left=56;top=144;right=120;bottom=173;font=LOGFONT( name='宋体' );z=1};
+edit={cls="edit";left=64;top=8;right=173;bottom=32;edge=1;font=LOGFONT( name='宋体' );z=3};
+edit2={cls="edit";left=64;top=40;right=173;bottom=64;edge=1;font=LOGFONT( name='宋体' );z=5};
+edit3={cls="edit";left=64;top=72;right=173;bottom=96;edge=1;font=LOGFONT( name='宋体' );z=7};
+edit4={cls="edit";left=64;top=104;right=173;bottom=128;edge=1;font=LOGFONT( name='宋体' );z=9};
+static={cls="static";text="姓名：";left=8;top=16;right=56;bottom=41;align="right";font=LOGFONT( name='宋体';h=-14 );transparent=1;z=2};
+static2={cls="static";text="性别：";left=8;top=48;right=56;bottom=73;align="right";font=LOGFONT( name='宋体';h=-14 );transparent=1;z=4};
+static3={cls="static";text="生日：";left=8;top=80;right=56;bottom=105;align="right";font=LOGFONT( name='宋体';h=-14 );transparent=1;z=6};
+static4={cls="static";text="QQ:";left=16;top=112;right=48;bottom=137;align="right";font=LOGFONT( name='宋体';h=-14 );transparent=1;z=8}
+)
+/*}}*/
+
+/*====================================
+1. 打开指定excel文件,读取此文件并显示在winform上
+====================================*/
+
+//打开excel读取数据
+var oExcel = com.CreateObject("Excel.Application");
+if (oExcel)
+{
+	oExcel.Visible = false;//是否显示，false为前台不显示excel文件
+	oExcel.WorkBooks.Open("d:/cdb.xls", null, 0);//打开指定目录的excel文件(要保证此目录有此文件)
+} 
+
+h=1//初始为第一行
+//在对应的文本框中填入原excel中对应的值，cells(行,列)
+winform.edit.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,1).Value2//将cdb.xls的sheet1中的h行第1列的值填入到第一个文本框里
+winform.edit2.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,2).Value2
+winform.edit3.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,3).Value2
+winform.edit4.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,4).Value2
+//因为窗体中文本框与excel中的列一一对应，故只将行作为参数
+
+//下面是按钮显示下一条,每点一下按钮显示下一条记录
+
+winform.button.oncommand = function(id,event){
+	h+=1//递增行
+	winform.edit.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,1).Value2
+	winform.edit2.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,2).Value2
+	winform.edit3.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,3).Value2
+	winform.edit4.text =oExcel.ActiveWorkBook.Sheets(1).cells(h,4).Value2
+}//endproc
+
+winform.show(true) //显示窗体
+win.loopMessage();//进入消息循环
+return winform;
+

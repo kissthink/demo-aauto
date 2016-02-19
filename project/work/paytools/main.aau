@@ -1,0 +1,190 @@
+import win.ui;
+import web.form;
+import inet.whttp;
+import web.json;
+import console;
+import com;
+import web.mshtml;
+import crypt; 
+import sqlite;
+
+
+// 直接解析页面
+/*DSG{{*/
+var winform = ..win.form(text="aardio Form";right=1049;bottom=549;border="none";mode="popup";parent=...;scroll=1)
+winform.add(
+button={cls="button";text="button";left=66;top=648;right=201;bottom=683;z=1};
+button2={cls="button";text="button2";left=286;top=639;right=421;bottom=674;z=2};
+button3={cls="button";text="button3";left=595;top=636;right=730;bottom=671;z=3};
+groupbox={cls="groupbox";text="groupbox";left=12;top=570;right=932;bottom=747;edge=1;z=4}
+)
+/*}}*/
+
+//创建web窗体
+var wb = web.form( winform );
+// 数据库相关
+var db = sqlite("/test.db");
+if( not db.existsTable("alipay_orders") ) {
+	db.exec("create table alipay_orders ( 
+			id int(11) unsigned AUTO_INCREMENT PRIMARY KEY, 
+			tradeNo varchar(20) comment '订单号',
+			createDate datetime comment '支付宝订单日期',
+			consumeTitle varchar(20) comment '备注',
+			custName varchar(20) comment '支付宝用户名',
+			custId varchar(20) comment '支付宝用户id', 
+			amount varchar(20) comment '金额',
+			status varchar(20) comment '状态',
+			fetchTime datetime comment ' ',
+			notifyStatus varchar(20) comment '通知状态',
+			notifyTimes tinyint(4) comment '通知次数',
+			lastNotifyTime datetime comment '最后通知时间',
+			notifyResult varchar(20) comment '通知结果'
+		);")
+}
+
+
+//打开目标网站
+wb.go("https://auth.alipay.com/login/index.htm?goto=https://www.alipay.com/");
+winform.show(true);
+wb.wait(""); 
+
+winform.button.oncommand = function(id,event){
+	//winform.msgbox( winform.button.text );
+	//	wb.go("http://baidu.com");
+	/*
+	account = wb.getEle("account");
+	winform.msgbox(account.value);
+	*/
+	
+	wb.go("https://consumeprod.alipay.com/record/standard.htm");
+	
+}
+
+winform.button2.oncommand = function(id,event){
+	var body = wb.document.getElementsByTagName("body")(0);
+	str=string.save("d:\test.html",body.innerHTML);
+
+	var str=string.load("d:\test.html");  //读取
+	var html = web.mshtml();  //生成解析器
+	html.write(str);   //解析下載的文本
+	var eles = html.queryEles(tagName="table");
+	console.log(eles[1]);
+	// eles[0]: thead
+	// eles[1]: tbody
+	var rows = eles[1].rows;
+//	console.log(rows)
+//	console.log(rows.length);
+	for(i=2;rows.length - 1)
+	{
+	
+		var row = rows(i);
+		var cells = row.cells;
+  		
+  		var p4=row.cells(3).innerText;  // 金额
+  		var p41 = string.replace(p4,"+ ", ""); // 去掉+号
+  		
+  		
+  		var p3=row.cells(2);  // desc, 流水号
+//  		console.log(333, p3.innerHTML);
+  		var ps = p3.getElementsByTagName("p");
+  		var ps0 = ps(0);   // 1.描述
+  		var ps1 = ps(1);   // 2.淘宝用户名 |
+  		
+  		var divs = p3.getElementsByTagName("div");
+  		var div = divs(0);
+  		var diva = div.getElementsByTagName("a")(0);
+  		var title = diva.title;  // 3.流水号
+  		/*
+  		var href = diva.href;
+  		var id = diva.id;
+  		console.log("div:", div.innerText);
+  		console.log("diva:", diva);
+  		console.log("---", href, id, diva["href"], diva["id"]);
+  		console.log("---", diva["title"], diva.title);
+  		console.log("---", diva["seed"], diva.seed, diva["smartracker"], diva.smartracker);
+  		console.log("---", diva["data-clipboard-text"], diva["class"], diva.class);
+  		*/
+  		
+		
+  		var p2=row.cells(1).innerText;  //4.时间（格式需调整）
+//  		console.log(2,p2);
+//  		var p5=row.cells(4).innerText;  // 明细
+//   		console.log(5, p5);
+  		var p6=row.cells(5).innerText;  // 5.状态
+  		if(p6=="交易成功") {
+  			var price = p41;
+  			var orderid = title;
+  			var desc = ps0.innerText;
+  			console.log(">>>>:", price, orderid, desc);
+  			
+  			var result = db.stepQuery("SELECT * FROM [alipay_orders] ", {tradeNo = orderid});
+  			console.log(result);
+  			console.varDump(result == null);
+  			if(result == null ){
+  				console.log("---");
+				var command = db.prepare("insert into alipay_orders(tradeNo, consumeTitle, amount) values (@tradeNo,@consumeTitle, @amount);" ) 
+  				command.bind.parameterByNamesAt( //绑定命名参数 
+					tradeNo = orderid;
+					consumeTitle = title;
+					amount = price;
+				);
+				command.step();//执行命令
+  			}
+  			
+  			var secretkey = "Q!W@e3r4123456";
+  			var api = "http://zgapi.taojoy.com.cn/";
+  			
+  			var param = "tradeNo=" + orderid + "&desc=" + desc + "&amount=" + price;
+  			var sig = crypt.md5(param + secretkey);
+  			
+  			var url = api + param + "&sig=" + sig;
+  			
+  			
+  			whttp = inet.whttp();
+	
+			str,errmsg = whttp.get(url);
+			if(errmsg != null ) {
+				winform.msgbox("error");
+			}
+			whttp.close();
+	
+  		} else {
+  			console.log("==error")
+  		}
+  		
+		console.log("=========")
+  		
+//  		console.log(p2,p3,p4);
+	}
+
+}
+
+winform.button3.oncommand = function(id,event){
+	var tmId = winform.addtimer(
+		1000,
+		function(hwnd,msg,id,tick){
+			winform.button2.oncommand();
+		}
+	)	
+	
+}
+
+
+/*
+//登录
+user = wb.getEle("account");
+user.value="z416177937";
+captcha = wb.getEle("captcha");
+captcha.value="32432";
+ele = wb.getEle("password");
+ele.value="qqqqqq";
+
+
+postData = string.fromto("account=15101167668&password=qqqqqq&captcha=243243",0,65001);
+wb.post( 'http://web.uqian.me/user/login');
+*/
+
+//进入消息循环
+win.loopMessage();
+return wb,winform;
+

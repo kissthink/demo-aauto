@@ -1,0 +1,137 @@
+import win.ui;
+import web.form;
+import inet.whttp;
+import web.json;
+import console;
+import com;
+/*DSG{{*/
+var winform = ..win.form(text="aardio Form";right=1049;bottom=749;parent=...;scroll=1)
+winform.add(
+button={cls="button";text="button";left=81;top=548;right=216;bottom=583;z=1};
+button2={cls="button";text="button2";left=409;top=544;right=544;bottom=579;z=2};
+button3={cls="button";text="inet请求";left=43;top=53;right=192;bottom=103;z=3};
+button4={cls="button";text="mshtml请求";left=217;top=54;right=389;bottom=99;z=4};
+button5={cls="button";text="mshtml请求2";left=420;top=54;right=592;bottom=99;z=5}
+)
+/*}}*/
+
+
+//创建web窗体
+var wb = web.form( winform );
+
+//实例就打开目标网站
+wb.go("http://web.uqian.me");
+winform.show(true);
+wb.wait(""); 
+
+// 点击按钮1跳转到新的页面
+winform.button.oncommand = function(id,event){
+	wb.go("http://web.uqian.me/goods/newannounces");
+	
+}
+
+// 点击按钮2做其他操作
+winform.button2.oncommand = function(id,event){
+	// 1.基本用法
+	var tab = wb.document.getEle("ulnewannounce"); // 按id查找
+	tab.value = "xxxxxx";        // 给指定html的tag加value
+	var lis = tab.getElementsByTagName("li");      // 按tagname查找,查出来是数组
+	console.log(lis(0)(0).innerText);
+
+	for index,obj in com.each(lis) {
+		var as = obj.getElementsByTagName("a");
+		for index,a in com.each(as) {
+			// tab()与tab[]两个值是不同的
+			// tab[0]是一个function;而tab(0)是一个table
+			console.log(a);        //此处为一个table
+			console.log(as[0]);    //此处为一个function
+			console.log(as(0));    //此处为一个table
+		} 
+	} 
+	
+	// 2.table可以转化为json
+	console.varDump(tab);
+	var json = web.json.stringify(tab,true);   // tab为table类型时可用
+	console.log(json);
+	
+	// 3.winform进行post请求
+	postData = string.fromto("account=15101167668&password=qqqqqq&captcha=243243",0,65001);
+	wb.post( 'http://web.uqian.me/user/login');
+	
+	// 4.winform进行get请求
+	wb.get('http://www.baidu.com');
+
+}
+
+// 5. 使用inet进行http请求
+winform.button3.oncommand = function(id,event){	
+	whttp = inet.whttp();
+	str,errmsg = whttp.get("http://www.baidu.com");
+	whttp.close();
+	if(str) {
+		string.save("abc.html", str);
+		//string.save("d:/abc.html", str);
+		winform.msgbox("ok");
+	} else {
+		winform.msgbox("error");
+	} 
+}
+
+// 6.使用mshtml解析器先在本地备份下再操作
+winform.button4.oncommand = function(id,event){
+	var http=inet.whttp();
+
+	var url="http://3w.nbedi.com/pre_bsq/para/zuanghuogang.asp";
+	var str,err=http.get(url);
+	console.log(err);
+	str=string.save("d:\test.txt",str); //保存到本地
+	
+	var str=string.load("d:\test.txt");  //读取
+	var html = web.mshtml();  //生成解析器
+	html.write(str);   //解析下載的文本
+	var eles = html.queryEles(tagName="table");
+	console.log(eles[1].rows.length);
+	for(i=1;eles[1].rows.length - 1)
+	{
+  	var pnamec=eles[1].rows(i).cells(0).innerText;
+  	var pnamee=eles[1].rows(i).cells(1).innerText;
+  	var ccodes=eles[1].rows(i).cells(2).innerText;
+  	var pcodes=eles[1].rows(i).cells(3).innerText;
+  	console.log(pnamec,pnamee,ccodes,pcodes);
+  	if(i>10) {
+  		break;
+  	}
+	}
+	console.pause(true);
+}
+
+// 7.使用mshtml解析器直接操作
+winform.button5.oncommand = function(id,event){
+	var http=inet.whttp();
+
+	var url="http://3w.nbedi.com/pre_bsq/para/zuanghuogang.asp";
+	var html = web.mshtml();  //生成解析器
+	html.go(url);   //解析下載的文本
+	var eles = html.queryEles(tagName="table");
+	console.log(eles[1].rows.length);
+	for(i=1;eles[1].rows.length - 1)
+	{
+  	var pnamec=eles[1].rows(i).cells(0).innerText;
+  	var pnamee=eles[1].rows(i).cells(1).innerText;
+  	var ccodes=eles[1].rows(i).cells(2).innerText;
+  	var pcodes=eles[1].rows(i).cells(3).innerText;
+  	console.log(pnamec,pnamee,ccodes,pcodes);
+  	if(i>10) {
+  		break;
+  	}
+	}
+	console.pause(true);
+}
+
+
+
+
+//进入消息循环
+win.loopMessage();
+return wb,winform;
+

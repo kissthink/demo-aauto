@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="gb2312"?>
+<project ver="8.1" name="aardio工程" libEmbed="true" icon="..." ui="win" output="aardio工程15.exe" CompanyName="W.QQ桌面客户端" FileDescription="aardio工程" LegalCopyright="Copyright (C) NinJa911 2011" ProductName="aardio工程" InternalName="aardio工程" FileVersion="0.0.0.02" ProductVersion="0.0.0.02" publishDir="/Publish/">
+	<file name="main.aau" path="default.main.aau" comment="default.main.aau"/>
+	<folder name="资源文件" path="res" embed="true">
+		<file name="cdb.xls" path="res\cdb.xls" comment="res\cdb.xls"/>
+	</folder>
+	<folder name="child" path="child" comment="目录" embed="false">
+		<file name="childz.aau" path="child\childz.aau" comment="child\childz.aau"/>
+		<file name="parent.aau" path="child\parent.aau" comment="child\parent.aau"/>
+	</folder>
+	<folder name="excel" path="excel" comment="目录" embed="false">
+		<file name="excel.aau" path="excel\excel.aau" comment="excel\excel.aau"/>
+		<file name="cdb.xls" path="excel\cdb.xls" comment="excel\cdb.xls"/>
+	</folder>
+	<folder name="path" path="path" comment="目录" embed="false">
+		<file name="fsys.aau" path="path\fsys.aau" comment="path\fsys.aau"/>
+	</folder>
+	<folder name="basic" path="basic" comment="目录" embed="false">
+		<file name="table.aau" path="basic\table.aau" comment="basic\table.aau"/>
+		<file name="json1.aau" path="basic\json1.aau" comment="basic\json1.aau"/>
+	</folder>
+	<folder name="web" path="web" comment="目录" embed="false">
+		<folder name="htmllayout" path="web\htmllayout" comment="目录" embed="false">
+			<file name="htmllayout.aau" path="web\htmllayout\htmllayout.aau" comment="web\htmllayout\htmllayout.aau"/>
+		</folder>
+		<folder name="webform" path="web\webform" comment="目录" embed="false">
+			<file name="webform1.aau" path="web\webform\webform1.aau" comment="web\webform\webform1.aau"/>
+		</folder>
+	</folder>
+</project>

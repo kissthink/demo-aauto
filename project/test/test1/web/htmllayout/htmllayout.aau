@@ -1,0 +1,25 @@
+import win.ui;
+
+
+/*==================================
+默认生成项目
+htmllayout项目是指在winform内
+打开本地的html文件or网站地址
+此项目就是打开baidu.com的实例
+==================================*/
+
+
+/*DSG{{*/
+var winform = ..win.form(text="HTMLayout 窗口";right=599;bottom=399)
+winform.add()
+/*}}*/
+
+import web.layout;
+import web.layout.behavior.windowCommand;
+import web.layout.behavior.windowSizer;
+ 
+var wbLayout = web.layout( winform )
+wbLayout.go("http://baidu.com") ;
+
+winform.show() 
+win.loopMessage();

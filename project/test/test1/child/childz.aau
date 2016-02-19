@@ -1,0 +1,15 @@
+import win; //必须首先导入win窗口支持库
+import win.ui;
+//import win.ui.menu;
+//import com;
+/*DSG{{*/
+var winform = ..win.form(text="AAuto Form";right=180;bottom=188;parent=...)
+winform.add(
+static={cls="static";text="我是子窗体";left=19;top=48;right=148;bottom=104;transparent=1;z=1}
+)
+/*}}*/
+
+winform.show(true) //显示窗体
+win.loopMessage();//进入消息循环
+return winform;
+
